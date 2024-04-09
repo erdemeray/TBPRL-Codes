@@ -1,1 +1,1 @@
-# Type-Based Protograph Raptor-Like LDPC Codes
+# Rate-Adaptive Protograph-Based Raptor-Like LDPC Code for Continuous-Variable Quantum Key Distribution
