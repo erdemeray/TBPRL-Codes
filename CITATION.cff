@@ -1,0 +1,36 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  Rate-Adaptive Protograph-Based Raptor-Like LDPC Code for
+  Continuous-Variable Quantum Key Distribution
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Erdem Eray
+    family-names: Cil
+    email: erdem.cil@kit.edu
+    affiliation: Karlsruhe Institute of Technology
+  - given-names: 'Laurent '
+    family-names: Schmalen
+    email: laurent.schmalen@kit.edu
+    affiliation: Karlsruhe Institute of Technology
+repository-code: 'https://github.com/erdemeray/TBPRL-Codes'
+abstract: >-
+  We propose a new type-based protograph raptor-like LDPC
+  code for rate-adaptive
+
+  information reconciliation in CV-QKD systems. It offers
+  robust error correction performance
+
+  across a wide range of rates while simplifying the code
+  design process.
+keywords:
+  - CV-QKD
+  - FEC
+  - PBRL LDPC Code
+  - Information Reconciliation
+license: Apache-2.0
