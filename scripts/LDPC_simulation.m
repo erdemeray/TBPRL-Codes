@@ -2,30 +2,32 @@
 % The LDPC code is defined by a Parity Check Matrix (PCM) loaded from a file.
 % The simulation is performed for a range of SNR (Signal-to-Noise Ratio) values.
 % The performance is evaluated in terms of Frame Error Rate (FER) and Bit Error Rate (BER).
+clearvars
 
 %% Set Parameters
 NoI = 250; % number of decoding iterations
 frames = 256; % number of erroneous frames
 FER_sim_limit = 1e-2; %minimum FER limit
-
-esno_dB = -15.45:0.05:-14.5; % Simulation SNR range
-rate_sim = [0.35,0.3,0.4]; % code rate - optimized for the rates between 0.2 and 0.01
-
 parallel_factor = 64;
 
-%channel parameters
-sigma = sqrt(0.5 * 10.^(-esno_dB/10));
-Lc = 4*10.^(esno_dB/10);
+
+rate_sim = [0.01,0.02,0.04]; % code rate - optimized for the rates between 0.2 and 0.01
+%Calculate the SNR range for different rates SNR = (2^(Coderate*2)-1) 
+SNR_start = floor(10*log10(2.^(rate_sim*2)-1)*10)/10; %in dB
+SNR_NofE = 150;
+stepsize = 0.05;
+SNR_end = SNR_start + stepsize*SNR_NofE;
+esno_dB = {SNR_start(1):stepsize:SNR_end(1);SNR_start(2):stepsize:SNR_end(2);SNR_start(3):stepsize:SNR_end(3)}; % Simulation SNR range 
+
     
     
 % simulation result vectors
-FER=zeros(numel(rate_sim),numel(esno_dB));
-BER=zeros(numel(rate_sim),numel(esno_dB));
+FER=zeros(numel(rate_sim),numel(esno_dB(1)));
+BER=zeros(numel(rate_sim),numel(esno_dB(1)));
 
 % Set the path of the PCM file.
-file_name = '../PCM/H_AZCW.mat';
-addpath('../PCM/','results\')
-
+file_name = 'Code/data/H_Rate_Adaptive_S1_50_S2_100_Expanded.mat';
+addpath('util/','../data/','results/')
 
 % initialize parallel cores
 p=gcp('nocreate');
@@ -45,6 +47,10 @@ end
 
 for j=1:numel(rate_sim)
 
+    %channel parameters
+    sigma = sqrt(10.^(-esno_dB{j}/10));
+    Lc = 4*10.^(esno_dB{j}/10);
+
     H = get_H(rate_sim(j),file_name); 
     
     n = size(H,2);
@@ -62,7 +68,7 @@ for j=1:numel(rate_sim)
     disp(['Number of erroneous frames: ' num2str(frames)]);
     
     
-    for i=1:numel(esno_dB)
+    for i=1:numel(esno_dB{j})
         errors = 0;
         errors_frame = 0;
         total_frames=0;
@@ -85,29 +91,25 @@ for j=1:numel(rate_sim)
             end
     
             total_frames=total_frames+frames;
+            if total_frames > frames/ FER_sim_limit
+                break;
+            end
     
         end
     
         BER(j,i) = errors / total_frames / n;
         FER(j,i) = errors_frame / total_frames;
     
-        str = sprintf('SNR: %.2f dB BER: %.5f FER: %.5f Erroneous / Total Frames: %i / %i',esno_dB(i),BER(j,i),FER(j,i),errors_frame,total_frames);
+        str = sprintf('SNR: %.2f dB BER: %.5f FER: %.5f Erroneous / Total Frames: %i / %i',esno_dB{j}(i),BER(j,i),FER(j,i),errors_frame,total_frames);
         disp(str);
     
         if FER(j,i) < FER_sim_limit   
-            disp(['Exiting the simulation due to the FER being less than the threshold ' num2str(FER_sim_limit) ' at the SNR ' num2str(esno_dB(i))] );
+            disp(['Exiting the simulation due to the FER being less than the threshold ' num2str(FER_sim_limit) ' at the SNR ' num2str(esno_dB{j}(i))] );
             break;
         end
     end
 end
 
-%% write results in results folder
+%% save the results
 
-% Replace the table with your results and the according names
-results = table(esno_dB.',BER.',FER.','VariableNames',{'Es/No',['BER_Coderates:',num2str(rate_sim)],['FER_Coderates:',num2str(rate_sim)]});
-    
-% Define the filename and directory (replace with your desired names)
-filename = 'results.txt';
-directory = 'results/';
-%write results
-writetable(results, fullfile(directory, filename));
+save('results/results', '-regexp', '^(?!(H|x)$).')
