@@ -49,7 +49,7 @@ for j=1:numel(rate_sim)
 
     %channel parameters
     sigma = sqrt(10.^(-esno_dB{j}/10));
-    Lc = 4*10.^(esno_dB{j}/10);
+    Lc = 2*10.^(esno_dB{j}/10);
 
     H = get_H(rate_sim(j),file_name); 
     
