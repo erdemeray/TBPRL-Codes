@@ -21,3 +21,6 @@ To run the example scripts, MATLAB needs to be installed along with the Communic
 
 ## Acknowledgment
 This work was funded by the German Federal Ministry of Education and Research (BMBF) under grant agreement 16KISQ056 (DE-QOR).
+
+## Cite as:
+E. E. Cil and L. Schmalen, "Rate-adaptive protograph-based raptor-like LDPC code for continuous-variable quantum key distribution," *Proc. Advanced Photonic Congress: Signal Processing in Photonic Communications (SPPCom)*, Québec City, Canada, Jul. 2024
