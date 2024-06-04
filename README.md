@@ -15,9 +15,8 @@ To run the example scripts, MATLAB needs to be installed along with the Communic
 - "H_AZCW.mat" is the PCM used to simulate the all-zero codeword(AZCW). It is used mainly in Monte-Carlo simulations to get the performance of the code.
 - For the syndrome decoding used in CV-QKD, "H_AZCW.mat" is enough, no generator matrix is necessary.
 
-## To-Do
-- Implementation of syndrome decoder
-
+## Updates
+- June 2024: The definitions for signal-to-noise ratio and capacity have been updated to align with those used in homodyne CV-QKD systems.
 
 ## Acknowledgment
 This work was funded by the German Federal Ministry of Education and Research (BMBF) under grant agreement 16KISQ056 (DE-QOR).

@@ -5,20 +5,25 @@
 clearvars
 
 %% Set Parameters
-NoI = 250; % number of decoding iterations
+NoI = 500; % number of decoding iterations
 frames = 256; % number of erroneous frames
 FER_sim_limit = 1e-2; %minimum FER limit
-parallel_factor = 64;
+parallel_factor = 32;
 
 
-rate_sim = [0.01,0.02,0.04]; % code rate - optimized for the rates between 0.2 and 0.01
+rate_sim = [0.2 0.01]; % code rate - optimized for the rates between 0.2 and 0.01
+
 %Calculate the SNR range for different rates SNR = (2^(Coderate*2)-1) 
 SNR_start = floor(10*log10(2.^(rate_sim*2)-1)*10)/10; %in dB
 SNR_NofE = 150;
 stepsize = 0.05;
 SNR_end = SNR_start + stepsize*SNR_NofE;
-esno_dB = {SNR_start(1):stepsize:SNR_end(1);SNR_start(2):stepsize:SNR_end(2);SNR_start(3):stepsize:SNR_end(3)}; % Simulation SNR range 
 
+esno_dB={};
+
+for i=1:numel(rate_sim)
+    esno_dB{i} = SNR_start(i):stepsize:SNR_end(i); % Simulation SNR range 
+end
     
     
 % simulation result vectors
@@ -26,8 +31,7 @@ FER=zeros(numel(rate_sim),numel(esno_dB(1)));
 BER=zeros(numel(rate_sim),numel(esno_dB(1)));
 
 % Set the path of the PCM file.
-file_name = 'Code/data/H_Rate_Adaptive_S1_50_S2_100_Expanded.mat';
-addpath('util/','../data/','results/')
+file_name = '../PCM/H_AZCW.mat';
 
 % initialize parallel cores
 p=gcp('nocreate');
@@ -49,7 +53,7 @@ for j=1:numel(rate_sim)
 
     %channel parameters
     sigma = sqrt(10.^(-esno_dB{j}/10));
-    Lc = 4*10.^(esno_dB{j}/10);
+    Lc = 2*10.^(esno_dB{j}/10);
 
     H = get_H(rate_sim(j),file_name); 
     
@@ -74,7 +78,7 @@ for j=1:numel(rate_sim)
         total_frames=0;
         str_length = 0;
         while errors_frame<frames
-            parfor frame = 1:(frames/parallel_factor)
+            for frame = 1:(frames/parallel_factor)
                 y = x + sigma(i)*randn(n,parallel_factor); % AWGN channel
     
                 % calculate LLRs
@@ -94,7 +98,7 @@ for j=1:numel(rate_sim)
             if total_frames > frames/ FER_sim_limit
                 break;
             end
-    
+                
         end
     
         BER(j,i) = errors / total_frames / n;
@@ -109,7 +113,3 @@ for j=1:numel(rate_sim)
         end
     end
 end
-
-%% save the results
-
-save('results/results', '-regexp', '^(?!(H|x)$).')
